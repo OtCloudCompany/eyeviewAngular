@@ -1,0 +1,28 @@
+<div class="container mt-5" style="max-width:400px;">
+  <h5 class="mb-3 text-center bg-light py-3 rounded">
+    <img src="/images/auweblogo-en.png" alt="" class="img-fluid" style="height: 32px;">
+    Dashboard Login</h5>
+  <div class="card">
+    <div class="card-body">
+      <form (ngSubmit)="onLogin()" class="bg-light p-4">
+        <div class="form-group mb-3">
+          <label>Email</label>
+          <input type="email" class="form-control" [(ngModel)]="email" name="email" required />
+        </div>
+        <div class="form-group mb-3">
+          <label>Password</label>
+          <input type="password" class="form-control" [(ngModel)]="password" name="password" required />
+        </div>
+        <button class="btn btn-primary w-100" type="submit">
+          Login
+          @if(isLoading){
+          <app-spinner></app-spinner>
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+  @if (error) {
+  <div class="alert alert-danger mt-3">{{ error }}</div>
+  }
+</div>

@@ -1,0 +1,39 @@
+<div class="accordion-item px-0 pt-0 mt-0 border-0">
+    <h2 class="accordion-header" id="headingTwo">
+        <button class="accordion-button collapsed rounded-top-0 my-0 py-1 border-top-none" type="button"
+            data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false"
+            aria-controls="collapseTwo"></button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+        data-bs-parent="#filtersForm">
+        <div class="accordion-body p-0">
+            <div class="container px-0 bg-light rounded-bottom border border-top-0">
+                <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <label for="country" class="form-label mb-0">Country</label>
+                            <ng-select [items]="country" bindLabel="name" bindValue="name" formControlName="country"
+                                [searchable]="true" class="w-100 bg-white p-1 border">
+                            </ng-select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="region" class="form-label mb-0">Region</label>
+                            <ng-select [items]="region" bindLabel="name" bindValue="name" formControlName="region"
+                                [searchable]="true" class="w-100 bg-white p-1 border">
+                            </ng-select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="thematicArea" class="form-label mb-0">Thematic Area</label>
+                            <ng-select [items]="thematicArea" bindLabel="name" bindValue="name"
+                                formControlName="thematicArea" [searchable]="true" class="w-100 bg-white p-1 border">
+                            </ng-select>
+                        </div>
+                        <div class="col-md-3 d-flex justify-content-end">
+                            <button type="submit" class="btn bg-paps-gold text-white">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

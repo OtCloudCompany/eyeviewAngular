@@ -1,0 +1,81 @@
+<div class="row my-4">
+    <div class="col-8">
+        <div class="card shadow-sm csv-upload-card">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Upload Activities Data</h5>
+
+                <!-- Drop area -->
+                <div class="mb-3 p-3 border rounded dropzone" [class.dropzone-dragging]="isDragging"
+                    (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                    role="region" aria-label="CSV file drop area">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3 display-6 text-muted"><i class="bi bi-upload"></i></div>
+                        <div>
+                            <div><strong>Drag & drop CSV here</strong></div>
+                            <div class="small text-muted">or</div>
+                            <div class="mt-2">
+                                <input type="file" accept=".csv" (change)="onFileSelected($event)" id="csvFile"
+                                    hidden />
+                                <label class="btn btn-outline-primary btn-sm" for="csvFile">Choose file</label>
+                                @if (selectedFile) {
+                                <span class="ms-2">{{ selectedFile.name }}</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- preview -->
+                <div *ngIf="previewRows?.length" class="mb-3">
+                    <h6 class="mb-2">Preview (first rows)</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th *ngFor="let h of previewRows[0]">{{ h }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of previewRows.slice(1)">
+                                    <td *ngFor="let cell of row">{{ cell }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- progress -->
+                <div *ngIf="uploading" class="mb-3">
+                    <label class="form-label">Uploading: {{ uploadProgress }}%</label>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" [style.width.%]="uploadProgress"
+                            [attr.aria-valuenow]="uploadProgress" aria-valuemin="0" aria-valuemax="100">
+                            {{ uploadProgress }}%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- messages -->
+                <div *ngIf="message" class="alert alert-success py-2">{{message}}</div>
+                <div *ngIf="error" class="alert alert-danger py-2">{{error}}</div>
+
+                <!-- buttons -->
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" (click)="upload()"
+                        [disabled]="!selectedFile || uploading">Upload</button>
+                    <button class="btn btn-outline-secondary" (click)="clear()" [disabled]="uploading">Clear</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card">
+            <div class="card-header">Download CSV Template</div>
+            <div class="card-body fw-lighter">
+              Download template <a href="/assets/metadata-template.csv">here</a>. Fill in the rest of the data
+              then upload it to import the data.
+            </div>
+        </div>
+    </div>
+</div>

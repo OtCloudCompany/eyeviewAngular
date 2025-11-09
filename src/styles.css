@@ -1,1 +1,201 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --paps-gray: #58595B;
+  --paps-gold: #B4A269;
+  --paps-maroon: #9F2241;
+  --paps-green: #348F41;
+  --paps-cgreen: #1A5632;
+}
+.bg-paps-gray, .bg-paps-gray:hover,.bg-paps-gray:focus, .bg-paps-gray:active {
+  background-color: var(--paps-gray) !important;
+  color: white !important;
+}
+
+.bg-paps-gold {
+  background-color: var(--paps-gold);
+}
+.bg-paps-maroon {
+  background-color: var(--paps-maroon) !important;
+  color: white !important;
+}
+.bg-paps-green {
+  background-color: var(--paps-green);
+}
+.bg-paps-cgreen {
+  background-color: var(--paps-cgreen);
+}
+.color-paps-gray {
+  color: var(--paps-gray);
+}
+.color-paps-gold {
+  color: var(--paps-gold);
+}
+.color-paps-maroon {
+  color: var(--paps-maroon);
+}
+.color-paps-green {
+  color: var(--paps-green);
+}
+.color-paps-cgreen {
+  color: var(--paps-cgreen);
+}
+
+.btn.bg-paps-gold:hover, .btn.bg-paps-gold:focus {
+  background-color: var(--paps-gold);
+  color: white;
+}
+.btn.bg-paps-gold:active {
+  background-color: var(--paps-gold);
+  color: white;
+}
+/* ====== Admin Layout Styling ====== */
+/* #wrapper {
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: all 0.3s ease;
+} */
+
+/* Sidebar */
+#sidebar-wrapper {
+  min-width: 250px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  /* prevent sidebar from shrinking */
+  background-color: #eee;
+  color: black !important;
+  min-height: 100vh;
+  position: sticky;
+  /* The magic! Stick to the viewport as you scroll. */
+  top: 0;
+  overflow-y: auto;
+}
+
+.list-group-sidebar>.list-group-item {
+  background-color: #ddd !important;
+  color: black !important;
+}
+
+/* Sidebar when collapsed */
+#wrapper.toggled #sidebar-wrapper {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.list-group-item {
+  border: none;
+}
+
+#sidebar-wrapper .list-group-item.bg-dark:hover,
+#sidebar-wrapper .list-group-item.bg-secondary:hover {
+  background-color: #495057;
+}
+
+.toggle-arrow {
+  transition: transform 0.3s ease;
+}
+
+/* Rotate arrow when expanded */
+a[aria-expanded="true"] .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+
+/* Page content flexes to take up remaining space */
+#page-content-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* prevent overflow */
+}
+
+/* Navbar fixes */
+#page-content-wrapper .navbar {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+#page-content-wrapper .navbar .container-fluid {
+  flex-wrap: nowrap;
+}
+
+/* Dropdown stays visible even on narrow screens */
+#page-content-wrapper .dropdown-menu-end {
+  right: 0;
+  left: auto;
+}
+
+/* Sidebar items */
+#sidebar-wrapper .list-group-item {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+#sidebar-wrapper .list-group-flush > .list-group-item {
+  border-bottom: solid 0.25px #eee !important;
+}
+
+button[data-bs-toggle="collapse"] i.bi-chevron-down {
+  transition: transform 0.2s ease;
+}
+
+button[data-bs-toggle="collapse"][aria-expanded="true"] i.bi-chevron-down {
+  transform: rotate(180deg);
+}
+
+/* ===== Footer Styling ===== */
+footer.footer {
+  flex-shrink: 0;
+  width: 100%;
+  text-align: center;
+  color: #6c757d;
+  background-color: #eee;
+  border-top: 1px solid #dee2e6;
+}
+
+#page-content-wrapper {
+  min-height: 100vh;
+}
+#dashboardFilters{
+  padding-top: 0px;
+}
+#dashboardFilters .accordion-button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+#dashboardFilters .accordion-button, #dashboardFilters .accordion-button:not(.collapsed) {
+  color: black !important;
+  border: none !important;
+  padding-top: 0px !important;
+  background-color: #fff !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+#dashboardFilters .accordion-item{
+  /* border: none !important; */
+  margin-top: 0px !important;
+  padding-top: 0px;
+}
+.ng-dropdown-panel{
+  background: #cee;
+  padding-left: 4px;
+  margin-left: 0px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+/* Upload csv form */
+.csv-upload-card .dropzone {
+  background: #f8f9fa;
+  border-style: dashed;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.csv-upload-card .dropzone-dragging {
+  background: #e9f7ff;
+  border-color: #0d6efd;
+}
+
+csv-upload-card .table-responsive { max-height: 260px; overflow: auto; }

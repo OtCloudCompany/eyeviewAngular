@@ -1,0 +1,128 @@
+<div class="container-fluid">
+    @if (!is_fetching && userProfile) {
+    <div class="row">
+        <div class="col-6">
+            <div class="card my-3">
+                <div class="card-header">Profile Details</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-responsive table-bordered table-hover">
+                            <tr>
+                                <td>First name</td>
+                                <td>{{ userProfile.first_name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Last name</td>
+                                <td>{{ userProfile.last_name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>{{ userProfile.email }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">Update Profile</div>
+                <div class="card-body">
+                    @if (profileUpdateMessage) {
+                    <app-alert [alertMsg]="profileUpdateMessage"></app-alert>
+                    }
+                    <form (ngSubmit)="onUpdateProfile()" [formGroup]="profileForm">
+                        <div class="form-group mb-3">
+                            <label>First name</label>
+                            <input type="text" class="form-control" formControlName="first_name" name="first_name"
+                                required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Last name</label>
+                            <input type="text" class="form-control" formControlName="last_name" name="last_name"
+                                required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Email</label>
+                            <input type="email" class="form-control" formControlName="email" name="email" required />
+                        </div>
+                        <button class="btn btn-primary w-100" type="submit">
+                            Update Profile
+                            @if (is_updating) {
+                            <app-spinner></app-spinner>
+                            }
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-6">
+            <div class="card my-3">
+                <div class="card-header">Change Password</div>
+                <div class="card-body">
+                    @if (passwordChangeMessage) {
+                    <app-alert [alertMsg]="passwordChangeMessage"></app-alert>
+                    }
+                    <form (ngSubmit)="changeUserPassword()" [formGroup]="passwordForm">
+                        <div class="form-group mb-3">
+                            <label>Old Password</label>
+                            <input type="password" formControlName="old_password" class="form-control" name="old_password" required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>New Password</label>
+                            <input type="password" formControlName="password" class="form-control" name="password" required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Repeat Password</label>
+                            <input type="password" formControlName="password2" class="form-control" name="password2" required />
+                        </div>
+                        <button class="btn btn-primary w-100" type="submit">
+                            Update Password
+                            @if (is_changing_password) {
+                            <app-spinner></app-spinner>
+                            }
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal" (click)="openModal()">
+                        Delete Profile
+                    </button>
+                </div>
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="deleteModalLabel">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                    Delete {{ userProfile.first_name }} ?
+                                </h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                @if (is_deleting) {
+
+                                Deleting user ... {{ userProfile.first_name }} <app-spinner></app-spinner>
+                                }
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger"
+                                    (click)="deleteUserProfile()">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    }
+    @if(is_fetching){
+    <div class="text-center my-4">Fetching user profile ... </div>
+    }
+</div>
