@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { HighchartsChartComponent } from 'highcharts-angular';
 import * as Highcharts from 'highcharts';
 import africaMap from '@highcharts/map-collection/custom/africa.topo.json';
@@ -9,19 +9,32 @@ import { preprocessMapData } from '../../map-preprocessor';
   imports: [HighchartsChartComponent],
   templateUrl: './africa-map.html',
   styleUrl: './africa-map.css',
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AfricaMap implements OnInit {
+export class AfricaMap implements OnInit, OnChanges {
   @Input() mapData: any;
+  @Output() countrySelected = new EventEmitter<string>();
   chartOptions: Highcharts.Options = {};
-  mapChartOptions: any;
+  mapChartOptions: any = {};
   Highcharts: typeof Highcharts = Highcharts;
 
   ngOnInit(): void {
+    this.buildChartOptions();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['mapData'] && !changes['mapData'].firstChange) {
+      this.buildChartOptions();
+    }
+  }
+
+  private buildChartOptions(): void {
     const processedMapData = preprocessMapData(this.mapData).map(item => ({
       ...item,
       value: item.value === 0 ? null : item.value
     }));
+    const component = this;
     this.mapChartOptions = {
       chart: {
         map: africaMap
@@ -60,8 +73,27 @@ export class AfricaMap implements OnInit {
           headerFormat: '',
           pointFormat: '{point.name}: {point.value}'
         }
-      }]
-    }
+      }],
+      plotOptions: {
+        series: {
+          point: {
+            events: {
+              click() {
+                const point = this as unknown as Highcharts.Point;
+                const name = point.name;
+                if (name) {
+                  component.onCountryPointClick(name);
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+  }
+
+  private onCountryPointClick(countryName: string): void {
+    this.countrySelected.emit(countryName);
   }
 
 }

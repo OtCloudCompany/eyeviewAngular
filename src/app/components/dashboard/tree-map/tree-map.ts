@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartComponent } from 'highcharts-angular';
@@ -8,15 +8,23 @@ import { HighchartsChartComponent } from 'highcharts-angular';
   imports: [HighchartsChartComponent, CommonModule],
   templateUrl: './tree-map.html',
   styleUrl: './tree-map.css',
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TreeMap implements OnInit {
+export class TreeMap implements OnInit, OnChanges {
   @Input() regionsData: any[] = [];
+  @Output() regionSelected = new EventEmitter<string>();
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = {};
 
   ngOnInit(): void {
     this.initChart();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['regionsData'] && !changes['regionsData'].firstChange) {
+      this.initChart();
+    }
   }
   initChart(): void {
     const randomColor = () => '#' + Math.floor(Math.random() * 16777215).toString(16);
@@ -26,6 +34,7 @@ export class TreeMap implements OnInit {
       value: item.count,
       color: colors[i % colors.length] // cycle through Highcharts palette
     }));
+    const component = this;
     this.chartOptions = {
       legend: {
         enabled: false // completely hides the legend
@@ -60,8 +69,26 @@ export class TreeMap implements OnInit {
       title: undefined,
       tooltip: {
         enabled: true
+      },
+      plotOptions: {
+        series: {
+          point: {
+            events: {
+              click() {
+                const name = (this as Highcharts.Point).name;
+                if (name) {
+                  component.onRegionPointClick(name);
+                }
+              }
+            }
+          }
+        }
       }
     };
+  }
+
+  onRegionPointClick(regionName: string): void {
+    this.regionSelected.emit(regionName);
   }
 
 }

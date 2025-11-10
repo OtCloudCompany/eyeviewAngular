@@ -10,6 +10,7 @@ import { YearBarchart } from "./year-barchart/year-barchart";
 import { DashboardActivities } from "./dashboard-activities/dashboard-activities";
 import { DashboardFilters } from "./dashboard-filters/dashboard-filters";
 import { PaginatedResponse, Activity } from '../../models/records.model';
+import { forkJoin, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,6 +37,9 @@ export class Dashboard implements OnInit {
     'years': 0,
     'activities': 0,
   };
+  selectedThematicArea: string | null = null;
+  selectedRegion: string | null = null;
+  selectedCountry: string | null = null;
 
   constructor(private dashboardService: DashboardService, private cd: ChangeDetectorRef) { }
 
@@ -52,6 +56,65 @@ export class Dashboard implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  onThematicAreaClick(facetValue: any) {
+    this.selectedThematicArea = facetValue.thematic_area;
+    this.selectedRegion = null;
+    this.selectedCountry = null;
+    this.loadDashboardData({ thematicArea: this.selectedThematicArea, region: null, country: null });
+  }
+
+  onRegionClick(regionName: string) {
+    this.selectedRegion = regionName;
+    this.selectedThematicArea = null;
+    this.selectedCountry = null;
+    this.loadDashboardData({ region: this.selectedRegion, thematicArea: null, country: null });
+  }
+
+  onCountryClick(countryName: string) {
+    this.selectedCountry = countryName;
+    this.selectedRegion = null;
+    this.selectedThematicArea = null;
+    this.loadDashboardData({ country: this.selectedCountry, region: null, thematicArea: null });
+  }
+
+  private loadDashboardData(filters: { thematicArea: string | null; region: string | null; country: string | null }) {
+    this.isLoading = true;
+    const normalizedFilters = {
+      thematicArea: filters.thematicArea,
+      region: filters.region,
+      country: filters.country
+    };
+
+    forkJoin({
+      countryStacks: this.dashboardService.getCountryStacks(normalizedFilters),
+      thematicFacets: this.dashboardService.getThematicFacets(normalizedFilters),
+      countryFacets: this.dashboardService.getCountryFacets(normalizedFilters),
+      regionsFacets: this.dashboardService.getRegionsFacets(normalizedFilters),
+      directorateFacets: this.dashboardService.getDirectorateFacets(normalizedFilters),
+      yearFacets: this.dashboardService.getYearFacets(normalizedFilters),
+      activities: this.dashboardService.getFilteredActivities(normalizedFilters)
+    })
+      .pipe(finalize(() => { this.isLoading = false; this.cd.markForCheck(); }))
+      .subscribe({
+        next: (results) => {
+          this.dashboardService.setCurrentFilters(normalizedFilters);
+          this.dashboardService.setData({
+            countryStacks: results.countryStacks,
+            stackedCountryFacets: results.countryStacks,
+            thematicFacets: results.thematicFacets,
+            countryFacets: results.countryFacets,
+            regionsFacets: results.regionsFacets,
+            directorateFacets: results.directorateFacets,
+            yearFacets: results.yearFacets,
+            activities: results.activities
+          });
+        },
+        error: (err) => {
+          console.error('Error loading dashboard data:', err);
+        }
+      });
   }
 
   prepareThematicFacets(data: any[]) {

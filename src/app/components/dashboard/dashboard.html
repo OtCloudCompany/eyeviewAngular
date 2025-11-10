@@ -21,18 +21,22 @@
                         @if (thematicFacets.length > 0) {
                         <ul class="list-group list-group-flush" style="max-height: 200px; overflow-y: auto;">
                             @for (facetValue of thematicFacets; track $index) {
-                            <li class="list-group-item d-flex justify-content-between align-items-center py-0 px-1"
-                                style="font-size: x-small;">
-                                {{ facetValue.thematic_area }}
-                                <span class="badge bg-primary rounded-pill">{{ facetValue.count }}</span>
-                            </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-1 border-bottom"
+                                    style="font-size: x-small; cursor: pointer;"
+                                    (click)="onThematicAreaClick(facetValue)">
+                                    {{ facetValue.thematic_area }}
+                                    <span class="badge bg-primary rounded-pill">{{ facetValue.count }}</span>
+                                </li>
                             }
                         </ul>
                         }
                     </div>
 
                     <div class="col-md-9 p-2 m-0">
-                        <app-tree-map [regionsData]="regionsFacets"></app-tree-map>
+                        <app-tree-map
+                            [regionsData]="regionsFacets"
+                            (regionSelected)="onRegionClick($event)">
+                        </app-tree-map>
                     </div>
                 </div>
                 <div class="container-fluid bg-light py-2">
@@ -42,7 +46,9 @@
             </div>
         </div>
         <div class="col-md-7 bg-light p-2">
-            <app-africa-map [mapData]="countryFacets" />
+            <app-africa-map
+                [mapData]="countryFacets"
+                (countrySelected)="onCountryClick($event)" />
         </div>
     </div>
     <div class="row px-2 bg-light pb-3">
