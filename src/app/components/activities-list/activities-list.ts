@@ -1,12 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Activity, PaginatedResponse } from '../../models/records.model';
 import { DashboardService } from '../../services/dashboard-service';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from "@angular/router";
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-activities-list',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
   templateUrl: './activities-list.html',
   styleUrl: './activities-list.css',
 })
@@ -16,16 +18,30 @@ export class ActivitiesList implements OnInit{
   error: string | null = null;
   page_size = 20;
   page = 1;
+  filterForm: FormGroup;
+  countryOptions: string[] = [];
+  regionOptions: string[] = [];
+  thematicOptions: string[] = [];
+  private currentFilters: { country: string | null; region: string | null; thematicArea: string | null } = {
+    country: null,
+    region: null,
+    thematicArea: null
+  };
 
   constructor(
     private dashboardService: DashboardService, 
-    private cd: ChangeDetectorRef){}
+    private cd: ChangeDetectorRef,
+    private fb: FormBuilder){
+      this.filterForm = this.fb.group({
+        country: [''],
+        region: [''],
+        thematicArea: ['']
+      });
+    }
 
   ngOnInit(): void {
-    this.dashboardService.getAllActivities(this.page, this.page_size).subscribe((data: PaginatedResponse<Activity>) =>{
-      this.activitiesResponse = data;
-      this.isLoading = false;
-    });
+    this.loadFilterOptions();
+    this.loadActivities();
   }
   /**
    * Fetches data for a specific page and updates the component's state.
@@ -36,17 +52,31 @@ export class ActivitiesList implements OnInit{
     // Don't fetch if already on that page
     if (this.activitiesResponse && this.activitiesResponse.current_page === page) return;
     
+    this.page = page;
+    this.loadActivities();
+  }
+
+  onFilterSubmit(): void {
+    const { country, region, thematicArea } = this.filterForm.value;
+    this.currentFilters = {
+      country: country || null,
+      region: region || null,
+      thematicArea: thematicArea || null
+    };
+    this.dashboardService.setCurrentFilters(this.currentFilters);
+    this.page = 1;
+    this.loadActivities();
+  }
+
+  private loadActivities(): void {
     this.isLoading = true;
     this.error = null;
-    
-    // Get current filters from the service
-    const currentFilters = this.dashboardService.getCurrentFilters();
-    
-    // Fetch activities with current filters and specified page
-    this.dashboardService.getFilteredActivities(currentFilters, page).subscribe({
+
+    this.dashboardService.getFilteredActivities(this.currentFilters, this.page).subscribe({
       next: (response) => {
         this.activitiesResponse = response;
         this.isLoading = false;
+        this.dashboardService.setCurrentFilters(this.currentFilters);
         this.cd.markForCheck();
       },
       error: (err) => {
@@ -56,6 +86,30 @@ export class ActivitiesList implements OnInit{
         this.cd.markForCheck();
       }
     });
+  }
+
+  private loadFilterOptions(): void {
+    const baseFilters = { country: null, region: null, thematicArea: null };
+    forkJoin({
+      countries: this.dashboardService.getCountryFacets(baseFilters),
+      regions: this.dashboardService.getRegionsFacets(baseFilters),
+      thematics: this.dashboardService.getThematicFacets(baseFilters)
+    }).subscribe({
+      next: (facets) => {
+        this.countryOptions = this.extractFacetNames(facets.countries, 'country');
+        this.regionOptions = this.extractFacetNames(facets.regions, 'region');
+        this.thematicOptions = this.extractFacetNames(facets.thematics, 'thematic_area');
+        this.cd.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error loading filter options:', err);
+      }
+    });
+  }
+
+  private extractFacetNames(items: any[], key: string): string[] {
+    const values = (items || []).map((item: any) => item?.[key]).filter((value: string | undefined) => !!value);
+    return Array.from(new Set(values));
   }
   /**
    * Generates an array of numbers for the pagination links.

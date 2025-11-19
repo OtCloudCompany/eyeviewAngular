@@ -6,7 +6,7 @@
     }
 
     <!-- Data Table and Pagination (only shown when not loading and no errors) -->
-    @if (!isLoading && activitiesResponse && activitiesResponse.results.length > 0) {
+    @if (!isLoading && activitiesResponse) {
     <nav class="navbar navbar-light bg-light my-2">
         <div class="container-fluid">
             <a class="navbar-brand">
@@ -24,7 +24,43 @@
         </div>
     </nav>
 
+    <form [formGroup]="filterForm" (ngSubmit)="onFilterSubmit()" class="bg-light border rounded p-3 mb-3">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="countryFilter" class="form-label mb-1">Country</label>
+                <select id="countryFilter" class="form-select" formControlName="country">
+                    <option value="">All countries</option>
+                    @for (country of countryOptions; track country) {
+                    <option [value]="country">{{ country }}</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="regionFilter" class="form-label mb-1">Region</label>
+                <select id="regionFilter" class="form-select" formControlName="region">
+                    <option value="">All regions</option>
+                    @for (region of regionOptions; track region) {
+                    <option [value]="region">{{ region }}</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="thematicFilter" class="form-label mb-1">Thematic Area</label>
+                <select id="thematicFilter" class="form-select" formControlName="thematicArea">
+                    <option value="">All thematic areas</option>
+                    @for (thematic of thematicOptions; track thematic) {
+                    <option [value]="thematic">{{ thematic }}</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn bg-paps-gold text-white">Apply Filters</button>
+        </div>
+    </form>
+
     <!-- Data Table -->
+    @if (activitiesResponse.results.length > 0) {
     <div class="table-responsive bg-light p-3 my-3">
         <table class="table table-striped table-hover table-bordered">
             <thead class="thead-dark">
@@ -53,9 +89,10 @@
             </tbody>
         </table>
     </div>
+    }
 
     <!-- No Data Message -->
-    @if (activitiesResponse && activitiesResponse.results.length === 0) {
+    @if (activitiesResponse.results.length === 0) {
     <div class="alert alert-info">
         No activities found.
     </div>
